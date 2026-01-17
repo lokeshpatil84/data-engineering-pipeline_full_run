@@ -1,0 +1,291 @@
+# GitHub Actions CI/CD Workflows
+# Automated CI/CD for CDC Data Pipeline
+
+name: CDC Pipeline CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - '**.py'
+      - '**.tf'
+      - '**.yml'
+      - 'requirements.txt'
+  pull_request:
+    branches: [main]
+
+env:
+  AWS_REGION: ap-south-1
+  TERRAFORM_VERSION: 1.5.0
+
+jobs:
+  # Lint and Validate
+  lint:
+    name: Lint & Validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install linting tools
+        run: |
+          pip install flake8 black isort mypy
+
+      - name: Run Black formatting check
+        run: black --check .
+
+      - name: Run isort check
+        run: isort --check-only .
+
+      - name: Run flake8
+        run: flake8 .
+
+      - name: Run Python type checking
+        run: mypy .
+
+  # Terraform Validation
+  terraform:
+    name: Terraform
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Terraform Init
+        working-directory: ./terraform
+        run: terraform init
+
+      - name: Terraform Validate
+        working-directory: ./terraform
+        run: terraform validate
+
+      - name: Terraform Plan
+        working-directory: ./terraform
+        run: |
+          terraform plan \
+            -var="project_name=cdc-pipeline" \
+            -var="environment=dev" \
+            -out=tfplan
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Upload Terraform Plan
+        uses: actions/upload-artifact@v3
+        with:
+          name: tfplan
+          path: terraform/tfplan
+
+      - name: Comment Terraform Plan
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const plan = fs.readFileSync('terraform/tfplan', 'utf8');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '```terraform\n' + plan + '\n```'
+            })
+        continue-on-error: true
+
+  # Docker Build and Test
+  docker:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker Compose
+        run: docker-compose build
+
+      - name: Run Docker Compose
+        run: docker-compose up -d
+
+      - name: Wait for services
+        run: |
+          sleep 30
+          docker-compose ps
+
+      - name: Test PostgreSQL
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -d cdc_demo -c "SELECT 1"
+
+      - name: Test Kafka
+        run: |
+          docker-compose exec -T kafka kafka-broker-api-versions --bootstrap-server localhost:9092
+
+      - name: Test Debezium
+        run: |
+          curl -s http://localhost:8083/connectors | head -c 100
+
+      - name: Cleanup Docker
+        run: docker-compose down -v
+
+  # Glue Jobs Validation
+  glue-jobs:
+    name: Validate Glue Jobs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Syntax check Glue jobs
+        run: |
+          python -m py_compile glue/cdc_processor.py
+          python -m py_compile glue/gold_processor.py
+
+      - name: Check imports
+        run: |
+          python -c "from glue.cdc_processor import *; print('cdc_processor imports OK')"
+          python -c "from glue.gold_processor import *; print('gold_processor imports OK')"
+
+  # Deploy to AWS (Main branch only)
+  deploy:
+    name: Deploy to AWS
+    needs: [lint, terraform, docker, glue-jobs]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://console.aws.amazon.com
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Init
+        working-directory: ./terraform
+        run: terraform init
+
+      - name: Terraform Apply
+        working-directory: ./terraform
+        run: |
+          terraform apply \
+            -var="project_name=cdc-pipeline" \
+            -var="environment=dev" \
+            -auto-approve
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Upload Glue Scripts to S3
+        run: |
+          aws s3 cp glue/cdc_processor.py s3://cdc-pipeline-dev-data-lake/scripts/
+          aws s3 cp glue/gold_processor.py s3://cdc-pipeline-dev-data-lake/scripts/
+
+      - name: Upload Airflow DAGs to S3
+        run: |
+          aws s3 cp airflow/dags/cdc_pipeline_dag.py s3://cdc-pipeline-dev-data-lake/dags/
+
+      - name: Trigger Glue Job Start
+        run: |
+          aws glue start-job-run --job-name cdc-pipeline-dev-cdc-processor
+
+      - name: Get Outputs
+        working-directory: ./terraform
+        run: terraform output
+
+  # Cleanup (Manual trigger)
+  cleanup:
+    name: Cleanup AWS Resources
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Destroy
+        working-directory: ./terraform
+        run: |
+          terraform destroy \
+            -var="project_name=cdc-pipeline" \
+            -var="environment=dev" \
+            -auto-approve
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  # Cost Optimization
+  cost-check:
+    name: Cost Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Check AWS Billing
+        run: |
+          aws ce get-cost-and-usage \
+            --time-period Start=$(date -d "1 day ago" +%Y-%m-%d),End=$(date +%Y-%m-%d) \
+            --granularity DAILY \
+            --metrics "UnblendedCost" \
+            --group-by Type=DIMENSION,Key=SERVICE
+
+      - name: List Running Resources
+        run: |
+          echo "=== EC2 Instances ==="
+          aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].[InstanceId,InstanceType,State.Name]' --output table
+
+          echo "=== ECS Services ==="
+          aws ecs list-services --cluster cdc-pipeline-dev-ecs --query 'serviceArns' --output text
+
+          echo "=== Glue Jobs ==="
+          aws glue get-job-runs --job-name cdc-pipeline-dev-cdc-processor --query 'JobRuns[?JobRunState==\'RUNNING\'].[JobRunId,JobRunState]' --output table
+

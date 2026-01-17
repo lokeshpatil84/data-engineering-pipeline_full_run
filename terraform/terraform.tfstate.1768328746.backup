@@ -1,0 +1,3602 @@
+{
+  "version": 4,
+  "terraform_version": "1.14.3",
+  "serial": 751,
+  "lineage": "67d90839-c6c5-9557-07ec-32ef0aecb8ab",
+  "outputs": {
+    "airflow_url": {
+      "value": "http://data-engineer-dev-airflow-670290711.ap-south-1.elb.amazonaws.com",
+      "type": "string"
+    },
+    "db_secret_arn": {
+      "value": "arn:aws:secretsmanager:ap-south-1:661722818226:secret:data-engineer-dev-db-credentials-G42wR1",
+      "type": "string"
+    },
+    "debezium_connect_url": {
+      "value": "http://data-engineer-dev-debezium-380939272.ap-south-1.elb.amazonaws.com:8083",
+      "type": "string"
+    },
+    "environment": {
+      "value": "dev",
+      "type": "string"
+    },
+    "glue_role_arn": {
+      "value": "arn:aws:iam::661722818226:role/data-engineer-dev-glue-role",
+      "type": "string"
+    },
+    "msk_bootstrap_brokers_sasl_iam": {
+      "value": null,
+      "type": "string",
+      "sensitive": true
+    },
+    "msk_bootstrap_servers": {
+      "value": null,
+      "type": "string",
+      "sensitive": true
+    },
+    "private_subnet_ids": {
+      "value": [
+        "subnet-09a5d378305bfa6ce",
+        "subnet-03cbb6437bb6f0c49"
+      ],
+      "type": [
+        "tuple",
+        [
+          "string",
+          "string"
+        ]
+      ]
+    },
+    "project_name": {
+      "value": "data-engineer",
+      "type": "string"
+    },
+    "public_subnet_ids": {
+      "value": [
+        "subnet-0bc3f7febada26325",
+        "subnet-0018157be9e6eba4a"
+      ],
+      "type": [
+        "tuple",
+        [
+          "string",
+          "string"
+        ]
+      ]
+    },
+    "quick_start_commands": {
+      "value": null,
+      "type": "string",
+      "sensitive": true
+    },
+    "rds_endpoint": {
+      "value": null,
+      "type": "string"
+    },
+    "s3_data_lake_bucket": {
+      "value": "data-engineer-dev-data-lake",
+      "type": "string"
+    },
+    "sns_topic_arn": {
+      "value": "arn:aws:sns:ap-south-1:661722818226:data-engineer-dev-alerts",
+      "type": "string"
+    },
+    "vpc_id": {
+      "value": "vpc-05d2a0de93f8a67da",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "data",
+      "type": "aws_availability_zones",
+      "name": "available",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "all_availability_zones": null,
+            "exclude_names": null,
+            "exclude_zone_ids": null,
+            "filter": null,
+            "group_names": [
+              "ap-south-1-zg-1"
+            ],
+            "id": "ap-south-1",
+            "names": [
+              "ap-south-1a",
+              "ap-south-1b",
+              "ap-south-1c"
+            ],
+            "state": "available",
+            "timeouts": null,
+            "zone_ids": [
+              "aps1-az1",
+              "aps1-az3",
+              "aps1-az2"
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "data",
+      "type": "aws_caller_identity",
+      "name": "current",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "account_id": "661722818226",
+            "arn": "arn:aws:iam::661722818226:user/jarvis-practice",
+            "id": "661722818226",
+            "user_id": "AIDAZUEOA42ZERNHWCG75"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_cloudwatch_metric_alarm",
+      "name": "cost_alarm",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "actions_enabled": true,
+            "alarm_actions": [
+              "arn:aws:sns:ap-south-1:661722818226:data-engineer-dev-alerts"
+            ],
+            "alarm_description": "This metric monitors AWS estimated charges",
+            "alarm_name": "data-engineer-dev-cost-alarm",
+            "arn": "arn:aws:cloudwatch:ap-south-1:661722818226:alarm:data-engineer-dev-cost-alarm",
+            "comparison_operator": "GreaterThanThreshold",
+            "datapoints_to_alarm": 0,
+            "dimensions": {
+              "Currency": "USD"
+            },
+            "evaluate_low_sample_count_percentiles": "",
+            "evaluation_periods": 1,
+            "extended_statistic": "",
+            "id": "data-engineer-dev-cost-alarm",
+            "insufficient_data_actions": [],
+            "metric_name": "EstimatedCharges",
+            "metric_query": [],
+            "namespace": "AWS/Billing",
+            "ok_actions": [],
+            "period": 86400,
+            "statistic": "Maximum",
+            "tags": {},
+            "tags_all": {},
+            "threshold": 50,
+            "threshold_metric_id": "",
+            "treat_missing_data": "missing",
+            "unit": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ==",
+          "dependencies": [
+            "aws_sns_topic.alerts"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_db_subnet_group",
+      "name": "main",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:rds:ap-south-1:661722818226:subgrp:data-engineer-dev-db-subnet",
+            "description": "Managed by Terraform",
+            "id": "data-engineer-dev-db-subnet",
+            "name": "data-engineer-dev-db-subnet",
+            "name_prefix": "",
+            "subnet_ids": [
+              "subnet-0840d3ca3820e6655",
+              "subnet-0c7167e881c9335d4"
+            ],
+            "supported_network_types": [],
+            "tags": {},
+            "tags_all": {},
+            "vpc_id": "vpc-05d2a0de93f8a67da"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjAifQ=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_secretsmanager_secret",
+      "name": "db_credentials",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:secretsmanager:ap-south-1:661722818226:secret:data-engineer-dev-db-credentials-G42wR1",
+            "description": "Database credentials for CDC pipeline",
+            "force_overwrite_replica_secret": false,
+            "id": "data-engineer-dev-db-credentials",
+            "kms_key_id": "",
+            "name": "data-engineer-dev-db-credentials",
+            "name_prefix": "",
+            "policy": "",
+            "recovery_window_in_days": 30,
+            "replica": [],
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_sns_topic",
+      "name": "alerts",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "application_failure_feedback_role_arn": "",
+            "application_success_feedback_role_arn": "",
+            "application_success_feedback_sample_rate": 0,
+            "archive_policy": "",
+            "arn": "arn:aws:sns:ap-south-1:661722818226:data-engineer-dev-alerts",
+            "beginning_archive_time": "",
+            "content_based_deduplication": false,
+            "delivery_policy": "",
+            "display_name": "",
+            "fifo_throughput_scope": "",
+            "fifo_topic": false,
+            "firehose_failure_feedback_role_arn": "",
+            "firehose_success_feedback_role_arn": "",
+            "firehose_success_feedback_sample_rate": 0,
+            "http_failure_feedback_role_arn": "",
+            "http_success_feedback_role_arn": "",
+            "http_success_feedback_sample_rate": 0,
+            "id": "arn:aws:sns:ap-south-1:661722818226:data-engineer-dev-alerts",
+            "kms_master_key_id": "",
+            "lambda_failure_feedback_role_arn": "",
+            "lambda_success_feedback_role_arn": "",
+            "lambda_success_feedback_sample_rate": 0,
+            "name": "data-engineer-dev-alerts",
+            "name_prefix": "",
+            "owner": "661722818226",
+            "policy": "{\"Id\":\"__default_policy_ID\",\"Statement\":[{\"Action\":[\"SNS:GetTopicAttributes\",\"SNS:SetTopicAttributes\",\"SNS:AddPermission\",\"SNS:RemovePermission\",\"SNS:DeleteTopic\",\"SNS:Subscribe\",\"SNS:ListSubscriptionsByTopic\",\"SNS:Publish\"],\"Condition\":{\"StringEquals\":{\"AWS:SourceOwner\":\"661722818226\"}},\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Resource\":\"arn:aws:sns:ap-south-1:661722818226:data-engineer-dev-alerts\",\"Sid\":\"__default_statement_ID\"}],\"Version\":\"2008-10-17\"}",
+            "signature_version": 0,
+            "sqs_failure_feedback_role_arn": "",
+            "sqs_success_feedback_role_arn": "",
+            "sqs_success_feedback_sample_rate": 0,
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tracing_config": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_sns_topic_subscription",
+      "name": "email_alerts",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:sns:ap-south-1:661722818226:data-engineer-dev-alerts:2cc7acdc-dfb7-4e9f-b1eb-a8eed764455c",
+            "confirmation_timeout_in_minutes": 1,
+            "confirmation_was_authenticated": false,
+            "delivery_policy": "",
+            "endpoint": "alerts@demo.local",
+            "endpoint_auto_confirms": false,
+            "filter_policy": "",
+            "filter_policy_scope": "",
+            "id": "arn:aws:sns:ap-south-1:661722818226:data-engineer-dev-alerts:2cc7acdc-dfb7-4e9f-b1eb-a8eed764455c",
+            "owner_id": "661722818226",
+            "pending_confirmation": true,
+            "protocol": "email",
+            "raw_message_delivery": false,
+            "redrive_policy": "",
+            "replay_policy": "",
+            "subscription_role_arn": "",
+            "topic_arn": "arn:aws:sns:ap-south-1:661722818226:data-engineer-dev-alerts"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_sns_topic.alerts"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.airflow",
+      "mode": "managed",
+      "type": "aws_cloudwatch_log_group",
+      "name": "airflow",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:logs:ap-south-1:661722818226:log-group:/aws/ecs/airflow",
+            "id": "/aws/ecs/airflow",
+            "kms_key_id": "",
+            "log_group_class": "STANDARD",
+            "name": "/aws/ecs/airflow",
+            "name_prefix": "",
+            "retention_in_days": 30,
+            "skip_destroy": false,
+            "tags": {},
+            "tags_all": {}
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "module": "module.airflow",
+      "mode": "managed",
+      "type": "aws_ecs_cluster",
+      "name": "airflow",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ecs:ap-south-1:661722818226:cluster/data-engineer-dev-airflow",
+            "configuration": [],
+            "id": "arn:aws:ecs:ap-south-1:661722818226:cluster/data-engineer-dev-airflow",
+            "name": "data-engineer-dev-airflow",
+            "service_connect_defaults": [],
+            "setting": [
+              {
+                "name": "containerInsights",
+                "value": "enabled"
+              }
+            ],
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-airflow",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-airflow",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "module": "module.airflow",
+      "mode": "managed",
+      "type": "aws_ecs_service",
+      "name": "airflow",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "alarms": [],
+            "availability_zone_rebalancing": "DISABLED",
+            "capacity_provider_strategy": [],
+            "cluster": "arn:aws:ecs:ap-south-1:661722818226:cluster/data-engineer-dev-airflow",
+            "deployment_circuit_breaker": [
+              {
+                "enable": false,
+                "rollback": false
+              }
+            ],
+            "deployment_controller": [
+              {
+                "type": "ECS"
+              }
+            ],
+            "deployment_maximum_percent": 200,
+            "deployment_minimum_healthy_percent": 100,
+            "desired_count": 1,
+            "enable_ecs_managed_tags": false,
+            "enable_execute_command": false,
+            "force_delete": null,
+            "force_new_deployment": null,
+            "health_check_grace_period_seconds": 0,
+            "iam_role": "/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
+            "id": "arn:aws:ecs:ap-south-1:661722818226:service/data-engineer-dev-airflow/data-engineer-dev-airflow",
+            "launch_type": "FARGATE",
+            "load_balancer": [
+              {
+                "container_name": "airflow-webserver",
+                "container_port": 8080,
+                "elb_name": "",
+                "target_group_arn": "arn:aws:elasticloadbalancing:ap-south-1:661722818226:targetgroup/data-engineer-dev-airflow/ae03a32fce43969f"
+              }
+            ],
+            "name": "data-engineer-dev-airflow",
+            "network_configuration": [
+              {
+                "assign_public_ip": false,
+                "security_groups": [
+                  "sg-02ef2fe09cef91655"
+                ],
+                "subnets": [
+                  "subnet-03cbb6437bb6f0c49",
+                  "subnet-09a5d378305bfa6ce"
+                ]
+              }
+            ],
+            "ordered_placement_strategy": [],
+            "placement_constraints": [],
+            "platform_version": "LATEST",
+            "propagate_tags": "NONE",
+            "scheduling_strategy": "REPLICA",
+            "service_connect_configuration": [],
+            "service_registries": [],
+            "tags": {},
+            "tags_all": {},
+            "task_definition": "arn:aws:ecs:ap-south-1:661722818226:task-definition/data-engineer-dev-airflow:3",
+            "timeouts": null,
+            "triggers": {},
+            "volume_configuration": [],
+            "vpc_lattice_configurations": [],
+            "wait_for_steady_state": false
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "data.aws_availability_zones.available",
+            "module.airflow.aws_ecs_cluster.airflow",
+            "module.airflow.aws_ecs_task_definition.airflow",
+            "module.airflow.aws_iam_role.ecs_task",
+            "module.airflow.aws_iam_role.ecs_task_execution",
+            "module.airflow.aws_lb_target_group.airflow",
+            "module.airflow.aws_security_group.airflow",
+            "module.vpc.aws_subnet.private",
+            "module.vpc.aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.airflow",
+      "mode": "managed",
+      "type": "aws_ecs_task_definition",
+      "name": "airflow",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ecs:ap-south-1:661722818226:task-definition/data-engineer-dev-airflow:3",
+            "arn_without_revision": "arn:aws:ecs:ap-south-1:661722818226:task-definition/data-engineer-dev-airflow",
+            "container_definitions": "[{\"command\":[\"scheduler\"],\"environment\":[{\"name\":\"AIRFLOW__CELERY__BROKER_URL\",\"value\":\"redis://localhost:6379/0\"},{\"name\":\"AIRFLOW__CORE__EXECUTOR\",\"value\":\"CeleryExecutor\"},{\"name\":\"AIRFLOW__DATABASE__SQL_ALCHEMY_CONN\",\"value\":\"postgresql://airflow:airflow@localhost:5432/airflow\"}],\"essential\":true,\"image\":\"apache/airflow:2.7.0\",\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"/aws/ecs/airflow\",\"awslogs-region\":\"ap-south-1\",\"awslogs-stream-prefix\":\"scheduler\"}},\"mountPoints\":[],\"name\":\"airflow-scheduler\",\"portMappings\":[],\"systemControls\":[],\"volumesFrom\":[]},{\"command\":[\"webserver\"],\"environment\":[{\"name\":\"AIRFLOW__CELERY__BROKER_URL\",\"value\":\"redis://localhost:6379/0\"},{\"name\":\"AIRFLOW__CELERY__RESULT_BACKEND\",\"value\":\"db+postgresql://airflow:airflow@localhost:5432/airflow\"},{\"name\":\"AIRFLOW__CORE__EXECUTOR\",\"value\":\"CeleryExecutor\"},{\"name\":\"AIRFLOW__DATABASE__SQL_ALCHEMY_CONN\",\"value\":\"postgresql://airflow:airflow@localhost:5432/airflow\"}],\"essential\":true,\"image\":\"apache/airflow:2.7.0\",\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"/aws/ecs/airflow\",\"awslogs-region\":\"ap-south-1\",\"awslogs-stream-prefix\":\"airflow\"}},\"mountPoints\":[],\"name\":\"airflow-webserver\",\"portMappings\":[{\"containerPort\":8080,\"hostPort\":8080,\"protocol\":\"tcp\"}],\"systemControls\":[],\"volumesFrom\":[]},{\"command\":[\"celery\",\"worker\"],\"environment\":[{\"name\":\"AIRFLOW__CELERY__BROKER_URL\",\"value\":\"redis://localhost:6379/0\"},{\"name\":\"AIRFLOW__CORE__EXECUTOR\",\"value\":\"CeleryExecutor\"},{\"name\":\"AIRFLOW__DATABASE__SQL_ALCHEMY_CONN\",\"value\":\"postgresql://airflow:airflow@localhost:5432/airflow\"}],\"essential\":true,\"image\":\"apache/airflow:2.7.0\",\"logConfiguration\":{\"logDriver\":\"awslogs\",\"options\":{\"awslogs-group\":\"/aws/ecs/airflow\",\"awslogs-region\":\"ap-south-1\",\"awslogs-stream-prefix\":\"worker\"}},\"mountPoints\":[],\"name\":\"airflow-worker\",\"portMappings\":[],\"systemControls\":[],\"volumesFrom\":[]}]",
+            "cpu": "512",
+            "enable_fault_injection": false,
+            "ephemeral_storage": [],
+            "execution_role_arn": "arn:aws:iam::661722818226:role/data-engineer-dev-airflow-execution-role",
+            "family": "data-engineer-dev-airflow",
+            "id": "data-engineer-dev-airflow",
+            "inference_accelerator": [],
+            "ipc_mode": "",
+            "memory": "2048",
+            "network_mode": "awsvpc",
+            "pid_mode": "",
+            "placement_constraints": [],
+            "proxy_configuration": [],
+            "requires_compatibilities": [
+              "FARGATE"
+            ],
+            "revision": 3,
+            "runtime_platform": [],
+            "skip_destroy": false,
+            "tags": {},
+            "tags_all": {},
+            "task_role_arn": "arn:aws:iam::661722818226:role/data-engineer-dev-airflow-task-role",
+            "track_latest": false,
+            "volume": []
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ==",
+          "dependencies": [
+            "module.airflow.aws_iam_role.ecs_task",
+            "module.airflow.aws_iam_role.ecs_task_execution"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.airflow",
+      "mode": "managed",
+      "type": "aws_iam_role",
+      "name": "ecs_task",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::661722818226:role/data-engineer-dev-airflow-task-role",
+            "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ecs-tasks.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+            "create_date": "2026-01-13T16:22:49Z",
+            "description": "",
+            "force_detach_policies": false,
+            "id": "data-engineer-dev-airflow-task-role",
+            "inline_policy": [],
+            "managed_policy_arns": [],
+            "max_session_duration": 3600,
+            "name": "data-engineer-dev-airflow-task-role",
+            "name_prefix": "",
+            "path": "/",
+            "permissions_boundary": "",
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-airflow-task-role",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-airflow-task-role",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "unique_id": "AROAZUEOA42ZPRODBI77I"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "module": "module.airflow",
+      "mode": "managed",
+      "type": "aws_iam_role",
+      "name": "ecs_task_execution",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::661722818226:role/data-engineer-dev-airflow-execution-role",
+            "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ecs-tasks.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+            "create_date": "2026-01-13T16:22:50Z",
+            "description": "",
+            "force_detach_policies": false,
+            "id": "data-engineer-dev-airflow-execution-role",
+            "inline_policy": [],
+            "managed_policy_arns": [
+              "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+            ],
+            "max_session_duration": 3600,
+            "name": "data-engineer-dev-airflow-execution-role",
+            "name_prefix": "",
+            "path": "/",
+            "permissions_boundary": "",
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-airflow-execution-role",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-airflow-execution-role",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "unique_id": "AROAZUEOA42ZJADZVQUHF"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "module": "module.airflow",
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "ecs_execution",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "data-engineer-dev-airflow-execution-role-20260113162252142900000005",
+            "policy_arn": "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
+            "role": "data-engineer-dev-airflow-execution-role"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.airflow.aws_iam_role.ecs_task_execution"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.airflow",
+      "mode": "managed",
+      "type": "aws_lb",
+      "name": "airflow",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "access_logs": [
+              {
+                "bucket": "",
+                "enabled": false,
+                "prefix": ""
+              }
+            ],
+            "arn": "arn:aws:elasticloadbalancing:ap-south-1:661722818226:loadbalancer/app/data-engineer-dev-airflow/54d5af1c5071bd5b",
+            "arn_suffix": "app/data-engineer-dev-airflow/54d5af1c5071bd5b",
+            "client_keep_alive": 3600,
+            "connection_logs": [
+              {
+                "bucket": "",
+                "enabled": false,
+                "prefix": ""
+              }
+            ],
+            "customer_owned_ipv4_pool": "",
+            "desync_mitigation_mode": "defensive",
+            "dns_name": "data-engineer-dev-airflow-670290711.ap-south-1.elb.amazonaws.com",
+            "dns_record_client_routing_policy": null,
+            "drop_invalid_header_fields": false,
+            "enable_cross_zone_load_balancing": true,
+            "enable_deletion_protection": false,
+            "enable_http2": true,
+            "enable_tls_version_and_cipher_suite_headers": false,
+            "enable_waf_fail_open": false,
+            "enable_xff_client_port": false,
+            "enable_zonal_shift": false,
+            "enforce_security_group_inbound_rules_on_private_link_traffic": "",
+            "id": "arn:aws:elasticloadbalancing:ap-south-1:661722818226:loadbalancer/app/data-engineer-dev-airflow/54d5af1c5071bd5b",
+            "idle_timeout": 60,
+            "internal": false,
+            "ip_address_type": "ipv4",
+            "ipam_pools": [],
+            "load_balancer_type": "application",
+            "minimum_load_balancer_capacity": [],
+            "name": "data-engineer-dev-airflow",
+            "name_prefix": "",
+            "preserve_host_header": false,
+            "security_groups": [
+              "sg-02ef2fe09cef91655"
+            ],
+            "subnet_mapping": [
+              {
+                "allocation_id": "",
+                "ipv6_address": "",
+                "outpost_id": "",
+                "private_ipv4_address": "",
+                "subnet_id": "subnet-0018157be9e6eba4a"
+              },
+              {
+                "allocation_id": "",
+                "ipv6_address": "",
+                "outpost_id": "",
+                "private_ipv4_address": "",
+                "subnet_id": "subnet-0bc3f7febada26325"
+              }
+            ],
+            "subnets": [
+              "subnet-0018157be9e6eba4a",
+              "subnet-0bc3f7febada26325"
+            ],
+            "tags": {},
+            "tags_all": {},
+            "timeouts": null,
+            "vpc_id": "vpc-05d2a0de93f8a67da",
+            "xff_header_processing_mode": "append",
+            "zone_id": "ZP97RAFLXTNZK"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6NjAwMDAwMDAwMDAwLCJ1cGRhdGUiOjYwMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "data.aws_availability_zones.available",
+            "module.airflow.aws_security_group.airflow",
+            "module.vpc.aws_subnet.public",
+            "module.vpc.aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.airflow",
+      "mode": "managed",
+      "type": "aws_lb_listener",
+      "name": "airflow",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "alpn_policy": null,
+            "arn": "arn:aws:elasticloadbalancing:ap-south-1:661722818226:listener/app/data-engineer-dev-airflow/54d5af1c5071bd5b/ac58ef54df682c68",
+            "certificate_arn": null,
+            "default_action": [
+              {
+                "authenticate_cognito": [],
+                "authenticate_oidc": [],
+                "fixed_response": [],
+                "forward": [],
+                "order": 1,
+                "redirect": [],
+                "target_group_arn": "arn:aws:elasticloadbalancing:ap-south-1:661722818226:targetgroup/data-engineer-dev-airflow/ae03a32fce43969f",
+                "type": "forward"
+              }
+            ],
+            "id": "arn:aws:elasticloadbalancing:ap-south-1:661722818226:listener/app/data-engineer-dev-airflow/54d5af1c5071bd5b/ac58ef54df682c68",
+            "load_balancer_arn": "arn:aws:elasticloadbalancing:ap-south-1:661722818226:loadbalancer/app/data-engineer-dev-airflow/54d5af1c5071bd5b",
+            "mutual_authentication": [],
+            "port": 80,
+            "protocol": "HTTP",
+            "routing_http_request_x_amzn_mtls_clientcert_header_name": null,
+            "routing_http_request_x_amzn_mtls_clientcert_issuer_header_name": null,
+            "routing_http_request_x_amzn_mtls_clientcert_leaf_header_name": null,
+            "routing_http_request_x_amzn_mtls_clientcert_serial_number_header_name": null,
+            "routing_http_request_x_amzn_mtls_clientcert_subject_header_name": null,
+            "routing_http_request_x_amzn_mtls_clientcert_validity_header_name": null,
+            "routing_http_request_x_amzn_tls_cipher_suite_header_name": null,
+            "routing_http_request_x_amzn_tls_version_header_name": null,
+            "routing_http_response_access_control_allow_credentials_header_value": "",
+            "routing_http_response_access_control_allow_headers_header_value": "",
+            "routing_http_response_access_control_allow_methods_header_value": "",
+            "routing_http_response_access_control_allow_origin_header_value": "",
+            "routing_http_response_access_control_expose_headers_header_value": "",
+            "routing_http_response_access_control_max_age_header_value": "",
+            "routing_http_response_content_security_policy_header_value": "",
+            "routing_http_response_server_enabled": true,
+            "routing_http_response_strict_transport_security_header_value": "",
+            "routing_http_response_x_content_type_options_header_value": "",
+            "routing_http_response_x_frame_options_header_value": "",
+            "ssl_policy": "",
+            "tags": {},
+            "tags_all": {},
+            "tcp_idle_timeout_seconds": null,
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsInVwZGF0ZSI6MzAwMDAwMDAwMDAwfX0=",
+          "dependencies": [
+            "data.aws_availability_zones.available",
+            "module.airflow.aws_lb.airflow",
+            "module.airflow.aws_lb_target_group.airflow",
+            "module.airflow.aws_security_group.airflow",
+            "module.vpc.aws_subnet.public",
+            "module.vpc.aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.airflow",
+      "mode": "managed",
+      "type": "aws_lb_target_group",
+      "name": "airflow",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:elasticloadbalancing:ap-south-1:661722818226:targetgroup/data-engineer-dev-airflow/ae03a32fce43969f",
+            "arn_suffix": "targetgroup/data-engineer-dev-airflow/ae03a32fce43969f",
+            "connection_termination": null,
+            "deregistration_delay": "300",
+            "health_check": [
+              {
+                "enabled": true,
+                "healthy_threshold": 3,
+                "interval": 30,
+                "matcher": "200",
+                "path": "/health",
+                "port": "traffic-port",
+                "protocol": "HTTP",
+                "timeout": 5,
+                "unhealthy_threshold": 3
+              }
+            ],
+            "id": "arn:aws:elasticloadbalancing:ap-south-1:661722818226:targetgroup/data-engineer-dev-airflow/ae03a32fce43969f",
+            "ip_address_type": "ipv4",
+            "lambda_multi_value_headers_enabled": false,
+            "load_balancer_arns": [
+              "arn:aws:elasticloadbalancing:ap-south-1:661722818226:loadbalancer/app/data-engineer-dev-airflow/54d5af1c5071bd5b"
+            ],
+            "load_balancing_algorithm_type": "round_robin",
+            "load_balancing_anomaly_mitigation": "off",
+            "load_balancing_cross_zone_enabled": "use_load_balancer_configuration",
+            "name": "data-engineer-dev-airflow",
+            "name_prefix": "",
+            "port": 8080,
+            "preserve_client_ip": null,
+            "protocol": "HTTP",
+            "protocol_version": "HTTP1",
+            "proxy_protocol_v2": false,
+            "slow_start": 0,
+            "stickiness": [
+              {
+                "cookie_duration": 86400,
+                "cookie_name": "",
+                "enabled": false,
+                "type": "lb_cookie"
+              }
+            ],
+            "tags": {},
+            "tags_all": {},
+            "target_failover": [
+              {
+                "on_deregistration": null,
+                "on_unhealthy": null
+              }
+            ],
+            "target_group_health": [
+              {
+                "dns_failover": [
+                  {
+                    "minimum_healthy_targets_count": "1",
+                    "minimum_healthy_targets_percentage": "off"
+                  }
+                ],
+                "unhealthy_state_routing": [
+                  {
+                    "minimum_healthy_targets_count": 1,
+                    "minimum_healthy_targets_percentage": "off"
+                  }
+                ]
+              }
+            ],
+            "target_health_state": [
+              {
+                "enable_unhealthy_connection_termination": null,
+                "unhealthy_draining_interval": null
+              }
+            ],
+            "target_type": "ip",
+            "vpc_id": "vpc-05d2a0de93f8a67da"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.vpc.aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.airflow",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "airflow",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-south-1:661722818226:security-group/sg-02ef2fe09cef91655",
+            "description": "Security group for Airflow",
+            "egress": [
+              {
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "description": "",
+                "from_port": 0,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "-1",
+                "security_groups": [],
+                "self": false,
+                "to_port": 0
+              }
+            ],
+            "id": "sg-02ef2fe09cef91655",
+            "ingress": [
+              {
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "description": "",
+                "from_port": 80,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "tcp",
+                "security_groups": [],
+                "self": false,
+                "to_port": 80
+              }
+            ],
+            "name": "data-engineer-dev-airflow-sg",
+            "name_prefix": "",
+            "owner_id": "661722818226",
+            "revoke_rules_on_delete": false,
+            "tags": {},
+            "tags_all": {},
+            "timeouts": null,
+            "vpc_id": "vpc-05d2a0de93f8a67da"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6OTAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIxIn0=",
+          "dependencies": [
+            "module.vpc.aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.ecs",
+      "mode": "managed",
+      "type": "aws_cloudwatch_log_group",
+      "name": "ecs",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:logs:ap-south-1:661722818226:log-group:/aws/ecs/data-engineer-dev-debezium",
+            "id": "/aws/ecs/data-engineer-dev-debezium",
+            "kms_key_id": "",
+            "log_group_class": "STANDARD",
+            "name": "/aws/ecs/data-engineer-dev-debezium",
+            "name_prefix": "",
+            "retention_in_days": 30,
+            "skip_destroy": false,
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-ecs-logs",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-ecs-logs",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "module": "module.ecs",
+      "mode": "managed",
+      "type": "aws_ecs_cluster",
+      "name": "main",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ecs:ap-south-1:661722818226:cluster/data-engineer-dev-ecs",
+            "configuration": [],
+            "id": "arn:aws:ecs:ap-south-1:661722818226:cluster/data-engineer-dev-ecs",
+            "name": "data-engineer-dev-ecs",
+            "service_connect_defaults": [],
+            "setting": [
+              {
+                "name": "containerInsights",
+                "value": "enabled"
+              }
+            ],
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-ecs",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-ecs",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "module": "module.ecs",
+      "mode": "managed",
+      "type": "aws_iam_role",
+      "name": "ecs_task",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::661722818226:role/data-engineer-dev-ecs-task",
+            "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ecs-tasks.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+            "create_date": "2026-01-13T16:22:47Z",
+            "description": "",
+            "force_detach_policies": false,
+            "id": "data-engineer-dev-ecs-task",
+            "inline_policy": [],
+            "managed_policy_arns": [],
+            "max_session_duration": 3600,
+            "name": "data-engineer-dev-ecs-task",
+            "name_prefix": "",
+            "path": "/",
+            "permissions_boundary": "",
+            "tags": {},
+            "tags_all": {},
+            "unique_id": "AROAZUEOA42ZN27JOLDMZ"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "module": "module.ecs",
+      "mode": "managed",
+      "type": "aws_iam_role",
+      "name": "ecs_task_execution",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::661722818226:role/data-engineer-dev-ecs-task-exec",
+            "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ecs-tasks.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+            "create_date": "2026-01-13T16:22:49Z",
+            "description": "",
+            "force_detach_policies": false,
+            "id": "data-engineer-dev-ecs-task-exec",
+            "inline_policy": [
+              {
+                "name": "data-engineer-dev-ecs-secrets",
+                "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":[\"secretsmanager:GetSecretValue\"],\"Effect\":\"Allow\",\"Resource\":\"arn:aws:secretsmanager:ap-south-1:661722818226:secret:data-engineer-dev-db-credentials-G42wR1\"},{\"Action\":[\"kms:Decrypt\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}"
+              }
+            ],
+            "managed_policy_arns": [
+              "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+            ],
+            "max_session_duration": 3600,
+            "name": "data-engineer-dev-ecs-task-exec",
+            "name_prefix": "",
+            "path": "/",
+            "permissions_boundary": "",
+            "tags": {},
+            "tags_all": {},
+            "unique_id": "AROAZUEOA42ZLACMVLTMN"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "module": "module.ecs",
+      "mode": "managed",
+      "type": "aws_iam_role_policy",
+      "name": "ecs_secrets",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "data-engineer-dev-ecs-task-exec:data-engineer-dev-ecs-secrets",
+            "name": "data-engineer-dev-ecs-secrets",
+            "name_prefix": "",
+            "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":[\"secretsmanager:GetSecretValue\"],\"Effect\":\"Allow\",\"Resource\":\"arn:aws:secretsmanager:ap-south-1:661722818226:secret:data-engineer-dev-db-credentials-G42wR1\"},{\"Action\":[\"kms:Decrypt\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}]}",
+            "role": "data-engineer-dev-ecs-task-exec"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_secretsmanager_secret.db_credentials",
+            "module.ecs.aws_iam_role.ecs_task_execution"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.ecs",
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "ecs_exec",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "data-engineer-dev-ecs-task-exec-20260113162251598700000004",
+            "policy_arn": "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
+            "role": "data-engineer-dev-ecs-task-exec"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.ecs.aws_iam_role.ecs_task_execution"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.ecs",
+      "mode": "managed",
+      "type": "aws_lb",
+      "name": "debezium",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "access_logs": [
+              {
+                "bucket": "",
+                "enabled": false,
+                "prefix": ""
+              }
+            ],
+            "arn": "arn:aws:elasticloadbalancing:ap-south-1:661722818226:loadbalancer/app/data-engineer-dev-debezium/1f8f4a483d4c0d44",
+            "arn_suffix": "app/data-engineer-dev-debezium/1f8f4a483d4c0d44",
+            "client_keep_alive": 3600,
+            "connection_logs": [
+              {
+                "bucket": "",
+                "enabled": false,
+                "prefix": ""
+              }
+            ],
+            "customer_owned_ipv4_pool": "",
+            "desync_mitigation_mode": "defensive",
+            "dns_name": "data-engineer-dev-debezium-380939272.ap-south-1.elb.amazonaws.com",
+            "dns_record_client_routing_policy": null,
+            "drop_invalid_header_fields": false,
+            "enable_cross_zone_load_balancing": true,
+            "enable_deletion_protection": false,
+            "enable_http2": true,
+            "enable_tls_version_and_cipher_suite_headers": false,
+            "enable_waf_fail_open": false,
+            "enable_xff_client_port": false,
+            "enable_zonal_shift": false,
+            "enforce_security_group_inbound_rules_on_private_link_traffic": "",
+            "id": "arn:aws:elasticloadbalancing:ap-south-1:661722818226:loadbalancer/app/data-engineer-dev-debezium/1f8f4a483d4c0d44",
+            "idle_timeout": 60,
+            "internal": false,
+            "ip_address_type": "ipv4",
+            "ipam_pools": [],
+            "load_balancer_type": "application",
+            "minimum_load_balancer_capacity": [],
+            "name": "data-engineer-dev-debezium",
+            "name_prefix": "",
+            "preserve_host_header": false,
+            "security_groups": [
+              "sg-0cf6968234af58831"
+            ],
+            "subnet_mapping": [
+              {
+                "allocation_id": "",
+                "ipv6_address": "",
+                "outpost_id": "",
+                "private_ipv4_address": "",
+                "subnet_id": "subnet-0018157be9e6eba4a"
+              },
+              {
+                "allocation_id": "",
+                "ipv6_address": "",
+                "outpost_id": "",
+                "private_ipv4_address": "",
+                "subnet_id": "subnet-0bc3f7febada26325"
+              }
+            ],
+            "subnets": [
+              "subnet-0018157be9e6eba4a",
+              "subnet-0bc3f7febada26325"
+            ],
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-debezium",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-debezium",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-05d2a0de93f8a67da",
+            "xff_header_processing_mode": "append",
+            "zone_id": "ZP97RAFLXTNZK"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6NjAwMDAwMDAwMDAwLCJ1cGRhdGUiOjYwMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "data.aws_availability_zones.available",
+            "module.vpc.aws_security_group.ecs",
+            "module.vpc.aws_subnet.public",
+            "module.vpc.aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.ecs",
+      "mode": "managed",
+      "type": "aws_lb_listener",
+      "name": "debezium",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "alpn_policy": null,
+            "arn": "arn:aws:elasticloadbalancing:ap-south-1:661722818226:listener/app/data-engineer-dev-debezium/1f8f4a483d4c0d44/78606f5a584c2ef1",
+            "certificate_arn": null,
+            "default_action": [
+              {
+                "authenticate_cognito": [],
+                "authenticate_oidc": [],
+                "fixed_response": [],
+                "forward": [],
+                "order": 1,
+                "redirect": [],
+                "target_group_arn": "arn:aws:elasticloadbalancing:ap-south-1:661722818226:targetgroup/data-engineer-dev-debezium/fb298130d72d490f",
+                "type": "forward"
+              }
+            ],
+            "id": "arn:aws:elasticloadbalancing:ap-south-1:661722818226:listener/app/data-engineer-dev-debezium/1f8f4a483d4c0d44/78606f5a584c2ef1",
+            "load_balancer_arn": "arn:aws:elasticloadbalancing:ap-south-1:661722818226:loadbalancer/app/data-engineer-dev-debezium/1f8f4a483d4c0d44",
+            "mutual_authentication": [],
+            "port": 8083,
+            "protocol": "HTTP",
+            "routing_http_request_x_amzn_mtls_clientcert_header_name": null,
+            "routing_http_request_x_amzn_mtls_clientcert_issuer_header_name": null,
+            "routing_http_request_x_amzn_mtls_clientcert_leaf_header_name": null,
+            "routing_http_request_x_amzn_mtls_clientcert_serial_number_header_name": null,
+            "routing_http_request_x_amzn_mtls_clientcert_subject_header_name": null,
+            "routing_http_request_x_amzn_mtls_clientcert_validity_header_name": null,
+            "routing_http_request_x_amzn_tls_cipher_suite_header_name": null,
+            "routing_http_request_x_amzn_tls_version_header_name": null,
+            "routing_http_response_access_control_allow_credentials_header_value": "",
+            "routing_http_response_access_control_allow_headers_header_value": "",
+            "routing_http_response_access_control_allow_methods_header_value": "",
+            "routing_http_response_access_control_allow_origin_header_value": "",
+            "routing_http_response_access_control_expose_headers_header_value": "",
+            "routing_http_response_access_control_max_age_header_value": "",
+            "routing_http_response_content_security_policy_header_value": "",
+            "routing_http_response_server_enabled": true,
+            "routing_http_response_strict_transport_security_header_value": "",
+            "routing_http_response_x_content_type_options_header_value": "",
+            "routing_http_response_x_frame_options_header_value": "",
+            "ssl_policy": "",
+            "tags": {},
+            "tags_all": {},
+            "tcp_idle_timeout_seconds": null,
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsInVwZGF0ZSI6MzAwMDAwMDAwMDAwfX0=",
+          "dependencies": [
+            "data.aws_availability_zones.available",
+            "module.ecs.aws_lb.debezium",
+            "module.ecs.aws_lb_target_group.debezium",
+            "module.vpc.aws_security_group.ecs",
+            "module.vpc.aws_subnet.public",
+            "module.vpc.aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.ecs",
+      "mode": "managed",
+      "type": "aws_lb_target_group",
+      "name": "debezium",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:elasticloadbalancing:ap-south-1:661722818226:targetgroup/data-engineer-dev-debezium/fb298130d72d490f",
+            "arn_suffix": "targetgroup/data-engineer-dev-debezium/fb298130d72d490f",
+            "connection_termination": null,
+            "deregistration_delay": "300",
+            "health_check": [
+              {
+                "enabled": true,
+                "healthy_threshold": 2,
+                "interval": 60,
+                "matcher": "200",
+                "path": "/connectors",
+                "port": "traffic-port",
+                "protocol": "HTTP",
+                "timeout": 30,
+                "unhealthy_threshold": 10
+              }
+            ],
+            "id": "arn:aws:elasticloadbalancing:ap-south-1:661722818226:targetgroup/data-engineer-dev-debezium/fb298130d72d490f",
+            "ip_address_type": "ipv4",
+            "lambda_multi_value_headers_enabled": false,
+            "load_balancer_arns": [
+              "arn:aws:elasticloadbalancing:ap-south-1:661722818226:loadbalancer/app/data-engineer-dev-debezium/1f8f4a483d4c0d44"
+            ],
+            "load_balancing_algorithm_type": "round_robin",
+            "load_balancing_anomaly_mitigation": "off",
+            "load_balancing_cross_zone_enabled": "use_load_balancer_configuration",
+            "name": "data-engineer-dev-debezium",
+            "name_prefix": "",
+            "port": 8083,
+            "preserve_client_ip": null,
+            "protocol": "HTTP",
+            "protocol_version": "HTTP1",
+            "proxy_protocol_v2": false,
+            "slow_start": 0,
+            "stickiness": [
+              {
+                "cookie_duration": 86400,
+                "cookie_name": "",
+                "enabled": false,
+                "type": "lb_cookie"
+              }
+            ],
+            "tags": {},
+            "tags_all": {},
+            "target_failover": [
+              {
+                "on_deregistration": null,
+                "on_unhealthy": null
+              }
+            ],
+            "target_group_health": [
+              {
+                "dns_failover": [
+                  {
+                    "minimum_healthy_targets_count": "1",
+                    "minimum_healthy_targets_percentage": "off"
+                  }
+                ],
+                "unhealthy_state_routing": [
+                  {
+                    "minimum_healthy_targets_count": 1,
+                    "minimum_healthy_targets_percentage": "off"
+                  }
+                ]
+              }
+            ],
+            "target_health_state": [
+              {
+                "enable_unhealthy_connection_termination": null,
+                "unhealthy_draining_interval": null
+              }
+            ],
+            "target_type": "ip",
+            "vpc_id": "vpc-05d2a0de93f8a67da"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.vpc.aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.glue",
+      "mode": "managed",
+      "type": "aws_cloudwatch_log_group",
+      "name": "glue",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:logs:ap-south-1:661722818226:log-group:/aws/glue/data-engineer-dev",
+            "id": "/aws/glue/data-engineer-dev",
+            "kms_key_id": "",
+            "log_group_class": "STANDARD",
+            "name": "/aws/glue/data-engineer-dev",
+            "name_prefix": "",
+            "retention_in_days": 30,
+            "skip_destroy": false,
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-glue-logs",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-glue-logs",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "module": "module.glue",
+      "mode": "managed",
+      "type": "aws_glue_catalog_database",
+      "name": "data_lake",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:glue:ap-south-1:661722818226:database/data-engineer_dev_data_lake",
+            "catalog_id": "661722818226",
+            "create_table_default_permission": [
+              {
+                "permissions": [
+                  "ALL"
+                ],
+                "principal": [
+                  {
+                    "data_lake_principal_identifier": "IAM_ALLOWED_PRINCIPALS"
+                  }
+                ]
+              }
+            ],
+            "description": "CDC Pipeline Data Lake Database",
+            "federated_database": [],
+            "id": "661722818226:data-engineer_dev_data_lake",
+            "location_uri": "",
+            "name": "data-engineer_dev_data_lake",
+            "parameters": {},
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-glue-db",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-glue-db",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "target_database": []
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "module": "module.glue",
+      "mode": "managed",
+      "type": "aws_glue_job",
+      "name": "cdc_processor",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:glue:ap-south-1:661722818226:job/data-engineer-dev-cdc-processor",
+            "command": [
+              {
+                "name": "glueetl",
+                "python_version": "3",
+                "runtime": "",
+                "script_location": "s3://data-engineer-dev-data-lake/scripts/cdc_processor.py"
+              }
+            ],
+            "connections": [],
+            "default_arguments": {
+              "--conf": "spark.sql.catalog.glue_catalog.io-impl=org.apache.iceberg.aws.s3.S3FileIO",
+              "--database_name": "cdc_demo",
+              "--enable-continuous-cloudwatch-log": "true",
+              "--enable-metrics": "",
+              "--region": "ap-south-1",
+              "--s3_bucket": "data-engineer-dev-data-lake"
+            },
+            "description": "",
+            "execution_class": "",
+            "execution_property": [
+              {
+                "max_concurrent_runs": 1
+              }
+            ],
+            "glue_version": "4.0",
+            "id": "data-engineer-dev-cdc-processor",
+            "job_run_queuing_enabled": false,
+            "maintenance_window": "",
+            "max_capacity": 2,
+            "max_retries": 0,
+            "name": "data-engineer-dev-cdc-processor",
+            "non_overridable_arguments": {},
+            "notification_property": [],
+            "number_of_workers": 2,
+            "role_arn": "arn:aws:iam::661722818226:role/data-engineer-dev-glue-role",
+            "security_configuration": "",
+            "source_control_details": [],
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-cdc-processor",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-cdc-processor",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "timeout": 120,
+            "worker_type": "G.1X"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "data.aws_availability_zones.available",
+            "module.glue.aws_iam_role.glue_role",
+            "module.kafka.aws_cloudwatch_log_group.msk",
+            "module.kafka.aws_kms_key.msk",
+            "module.kafka.aws_msk_cluster.main",
+            "module.kafka.aws_msk_configuration.main",
+            "module.kafka.aws_security_group.kafka",
+            "module.kafka.data.aws_caller_identity.current",
+            "module.s3.aws_s3_bucket.data_lake",
+            "module.vpc.aws_security_group.ecs",
+            "module.vpc.aws_subnet.private",
+            "module.vpc.aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.glue",
+      "mode": "managed",
+      "type": "aws_glue_job",
+      "name": "gold_processor",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:glue:ap-south-1:661722818226:job/data-engineer-dev-gold-processor",
+            "command": [
+              {
+                "name": "glueetl",
+                "python_version": "3",
+                "runtime": "",
+                "script_location": "s3://data-engineer-dev-data-lake/scripts/gold_processor.py"
+              }
+            ],
+            "connections": [],
+            "default_arguments": {
+              "--conf": "spark.sql.catalog.glue_catalog.io-impl=org.apache.iceberg.aws.s3.S3FileIO",
+              "--database_name": "cdc_demo",
+              "--enable-continuous-cloudwatch-log": "true",
+              "--enable-metrics": "",
+              "--region": "ap-south-1",
+              "--s3_bucket": "data-engineer-dev-data-lake"
+            },
+            "description": "",
+            "execution_class": "",
+            "execution_property": [
+              {
+                "max_concurrent_runs": 1
+              }
+            ],
+            "glue_version": "4.0",
+            "id": "data-engineer-dev-gold-processor",
+            "job_run_queuing_enabled": false,
+            "maintenance_window": "",
+            "max_capacity": 2,
+            "max_retries": 0,
+            "name": "data-engineer-dev-gold-processor",
+            "non_overridable_arguments": {},
+            "notification_property": [],
+            "number_of_workers": 2,
+            "role_arn": "arn:aws:iam::661722818226:role/data-engineer-dev-glue-role",
+            "security_configuration": "",
+            "source_control_details": [],
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-gold-processor",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-gold-processor",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "timeout": 120,
+            "worker_type": "G.1X"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "data.aws_availability_zones.available",
+            "module.glue.aws_iam_role.glue_role",
+            "module.kafka.aws_cloudwatch_log_group.msk",
+            "module.kafka.aws_kms_key.msk",
+            "module.kafka.aws_msk_cluster.main",
+            "module.kafka.aws_msk_configuration.main",
+            "module.kafka.aws_security_group.kafka",
+            "module.kafka.data.aws_caller_identity.current",
+            "module.s3.aws_s3_bucket.data_lake",
+            "module.vpc.aws_security_group.ecs",
+            "module.vpc.aws_subnet.private",
+            "module.vpc.aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.glue",
+      "mode": "managed",
+      "type": "aws_iam_policy",
+      "name": "glue_catalog_policy",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::661722818226:policy/data-engineer-dev-glue-catalog-policy",
+            "attachment_count": 1,
+            "description": "",
+            "id": "arn:aws:iam::661722818226:policy/data-engineer-dev-glue-catalog-policy",
+            "name": "data-engineer-dev-glue-catalog-policy",
+            "name_prefix": "",
+            "path": "/",
+            "policy": "{\"Statement\":[{\"Action\":[\"glue:GetDatabase\",\"glue:CreateDatabase\",\"glue:GetTable\",\"glue:CreateTable\",\"glue:UpdateTable\",\"glue:GetPartitions\",\"glue:CreatePartition\",\"glue:BatchCreatePartition\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}],\"Version\":\"2012-10-17\"}",
+            "policy_id": "ANPAZUEOA42ZHXXABBWKK",
+            "tags": {},
+            "tags_all": {}
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "module": "module.glue",
+      "mode": "managed",
+      "type": "aws_iam_policy",
+      "name": "glue_logs_policy",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::661722818226:policy/data-engineer-dev-glue-logs-policy",
+            "attachment_count": 1,
+            "description": "",
+            "id": "arn:aws:iam::661722818226:policy/data-engineer-dev-glue-logs-policy",
+            "name": "data-engineer-dev-glue-logs-policy",
+            "name_prefix": "",
+            "path": "/",
+            "policy": "{\"Statement\":[{\"Action\":[\"logs:CreateLogGroup\",\"logs:CreateLogStream\",\"logs:PutLogEvents\"],\"Effect\":\"Allow\",\"Resource\":\"arn:aws:logs:*:*:log-group:/aws/glue/*\"}],\"Version\":\"2012-10-17\"}",
+            "policy_id": "ANPAZUEOA42ZL7B6MNZ5F",
+            "tags": {},
+            "tags_all": {}
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "module": "module.glue",
+      "mode": "managed",
+      "type": "aws_iam_policy",
+      "name": "glue_msk_policy",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::661722818226:policy/data-engineer-dev-glue-msk-policy",
+            "attachment_count": 0,
+            "description": "",
+            "id": "arn:aws:iam::661722818226:policy/data-engineer-dev-glue-msk-policy",
+            "name": "data-engineer-dev-glue-msk-policy",
+            "name_prefix": "",
+            "path": "/",
+            "policy": "{\"Statement\":[{\"Action\":[\"kafka:DescribeCluster\",\"kafka:GetBootstrapBrokers\",\"kafka:DescribeTopic\",\"kafka:ListTopics\"],\"Effect\":\"Allow\",\"Resource\":\"*\"}],\"Version\":\"2012-10-17\"}",
+            "policy_id": "ANPAZUEOA42ZCKLFBLU37",
+            "tags": null,
+            "tags_all": {}
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "module": "module.glue",
+      "mode": "managed",
+      "type": "aws_iam_policy",
+      "name": "glue_s3_policy",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::661722818226:policy/data-engineer-dev-glue-s3-policy",
+            "attachment_count": 1,
+            "description": "",
+            "id": "arn:aws:iam::661722818226:policy/data-engineer-dev-glue-s3-policy",
+            "name": "data-engineer-dev-glue-s3-policy",
+            "name_prefix": "",
+            "path": "/",
+            "policy": "{\"Statement\":[{\"Action\":[\"s3:GetObject\",\"s3:PutObject\",\"s3:DeleteObject\"],\"Effect\":\"Allow\",\"Resource\":[\"arn:aws:s3:::data-engineer-dev-data-lake\",\"arn:aws:s3:::data-engineer-dev-data-lake/*\"]},{\"Action\":[\"s3:ListBucket\"],\"Effect\":\"Allow\",\"Resource\":\"arn:aws:s3:::data-engineer-dev-data-lake\"}],\"Version\":\"2012-10-17\"}",
+            "policy_id": "ANPAZUEOA42ZNRHSZZC6G",
+            "tags": {},
+            "tags_all": {}
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.s3.aws_s3_bucket.data_lake"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.glue",
+      "mode": "managed",
+      "type": "aws_iam_role",
+      "name": "glue_role",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::661722818226:role/data-engineer-dev-glue-role",
+            "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"glue.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+            "create_date": "2026-01-13T16:22:47Z",
+            "description": "",
+            "force_detach_policies": false,
+            "id": "data-engineer-dev-glue-role",
+            "inline_policy": [],
+            "managed_policy_arns": [
+              "arn:aws:iam::661722818226:policy/data-engineer-dev-glue-catalog-policy",
+              "arn:aws:iam::661722818226:policy/data-engineer-dev-glue-logs-policy",
+              "arn:aws:iam::661722818226:policy/data-engineer-dev-glue-s3-policy",
+              "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
+            ],
+            "max_session_duration": 3600,
+            "name": "data-engineer-dev-glue-role",
+            "name_prefix": "",
+            "path": "/",
+            "permissions_boundary": "",
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-glue-role",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-glue-role",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "unique_id": "AROAZUEOA42ZFDIVYOFIZ"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "create_before_destroy": true
+        }
+      ]
+    },
+    {
+      "module": "module.glue",
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "glue_catalog",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "data-engineer-dev-glue-role-20260113171958385400000002",
+            "policy_arn": "arn:aws:iam::661722818226:policy/data-engineer-dev-glue-catalog-policy",
+            "role": "data-engineer-dev-glue-role"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.glue.aws_iam_policy.glue_catalog_policy",
+            "module.glue.aws_iam_role.glue_role"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.glue",
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "glue_logs",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "data-engineer-dev-glue-role-20260113162250858700000003",
+            "policy_arn": "arn:aws:iam::661722818226:policy/data-engineer-dev-glue-logs-policy",
+            "role": "data-engineer-dev-glue-role"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.glue.aws_iam_policy.glue_logs_policy",
+            "module.glue.aws_iam_role.glue_role"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.glue",
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "glue_msk",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "data-engineer-dev-glue-role-20260113181524316000000001",
+            "policy_arn": "arn:aws:iam::661722818226:policy/data-engineer-dev-glue-msk-policy",
+            "role": "data-engineer-dev-glue-role"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.glue.aws_iam_policy.glue_msk_policy",
+            "module.glue.aws_iam_role.glue_role"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.glue",
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "glue_s3",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "data-engineer-dev-glue-role-20260113162256135000000006",
+            "policy_arn": "arn:aws:iam::661722818226:policy/data-engineer-dev-glue-s3-policy",
+            "role": "data-engineer-dev-glue-role"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.glue.aws_iam_policy.glue_s3_policy",
+            "module.glue.aws_iam_role.glue_role",
+            "module.s3.aws_s3_bucket.data_lake"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.glue",
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "glue_service",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "data-engineer-dev-glue-role-20260113162250191000000002",
+            "policy_arn": "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole",
+            "role": "data-engineer-dev-glue-role"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.glue.aws_iam_role.glue_role"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.kafka",
+      "mode": "data",
+      "type": "aws_caller_identity",
+      "name": "current",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "account_id": "661722818226",
+            "arn": "arn:aws:iam::661722818226:user/jarvis-practice",
+            "id": "661722818226",
+            "user_id": "AIDAZUEOA42ZERNHWCG75"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "module": "module.kafka",
+      "mode": "managed",
+      "type": "aws_cloudwatch_log_group",
+      "name": "msk",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:logs:ap-south-1:661722818226:log-group:/aws/msk/data-engineer-dev",
+            "id": "/aws/msk/data-engineer-dev",
+            "kms_key_id": "",
+            "log_group_class": "STANDARD",
+            "name": "/aws/msk/data-engineer-dev",
+            "name_prefix": "",
+            "retention_in_days": 30,
+            "skip_destroy": false,
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-msk-logs",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-msk-logs",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "module": "module.kafka",
+      "mode": "managed",
+      "type": "aws_kms_key",
+      "name": "msk",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:kms:ap-south-1:661722818226:key/cf396353-5740-471a-893f-b3c84453d1ca",
+            "bypass_policy_lockout_safety_check": false,
+            "custom_key_store_id": "",
+            "customer_master_key_spec": "SYMMETRIC_DEFAULT",
+            "deletion_window_in_days": null,
+            "description": "KMS key for MSK encryption",
+            "enable_key_rotation": false,
+            "id": "cf396353-5740-471a-893f-b3c84453d1ca",
+            "is_enabled": true,
+            "key_id": "cf396353-5740-471a-893f-b3c84453d1ca",
+            "key_usage": "ENCRYPT_DECRYPT",
+            "multi_region": false,
+            "policy": "{\"Statement\":[{\"Action\":\"kms:*\",\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"arn:aws:iam::661722818226:root\"},\"Resource\":\"*\",\"Sid\":\"Enable IAM User Permissions\"},{\"Action\":[\"kms:Encrypt\",\"kms:Decrypt\",\"kms:GenerateDataKey\"],\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"kafka.amazonaws.com\"},\"Resource\":\"*\",\"Sid\":\"Allow access for MSK\"}],\"Version\":\"2012-10-17\"}",
+            "rotation_period_in_days": 0,
+            "tags": {},
+            "tags_all": {},
+            "timeouts": null,
+            "xks_key_id": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDB9fQ==",
+          "dependencies": [
+            "module.kafka.data.aws_caller_identity.current"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.kafka",
+      "mode": "managed",
+      "type": "aws_msk_configuration",
+      "name": "main",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:kafka:ap-south-1:661722818226:configuration/data-engineer-dev-msk-config/f5b0e711-df25-410f-87ae-90df5d097f20-2",
+            "description": "",
+            "id": "arn:aws:kafka:ap-south-1:661722818226:configuration/data-engineer-dev-msk-config/f5b0e711-df25-410f-87ae-90df5d097f20-2",
+            "kafka_versions": [
+              "3.5.1"
+            ],
+            "latest_revision": 1,
+            "name": "data-engineer-dev-msk-config",
+            "server_properties": "auto.create.topics.enable=true\ndelete.topic.enable=true\nlog.retention.hours=168\nnum.partitions=3\ndefault.replication.factor=2\nmin.insync.replicas=1\n"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "module": "module.s3",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "data_lake",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "acceleration_status": "",
+            "acl": null,
+            "arn": "arn:aws:s3:::data-engineer-dev-data-lake",
+            "bucket": "data-engineer-dev-data-lake",
+            "bucket_domain_name": "data-engineer-dev-data-lake.s3.amazonaws.com",
+            "bucket_prefix": "",
+            "bucket_regional_domain_name": "data-engineer-dev-data-lake.s3.ap-south-1.amazonaws.com",
+            "cors_rule": [],
+            "force_destroy": false,
+            "grant": [
+              {
+                "id": "0ebe0385936f20c87931e5eccb31e71491dfbc87466fc46220820238687ceac4",
+                "permissions": [
+                  "FULL_CONTROL"
+                ],
+                "type": "CanonicalUser",
+                "uri": ""
+              }
+            ],
+            "hosted_zone_id": "Z11RGJOFQNVJUP",
+            "id": "data-engineer-dev-data-lake",
+            "lifecycle_rule": [
+              {
+                "abort_incomplete_multipart_upload_days": 0,
+                "enabled": true,
+                "expiration": [
+                  {
+                    "date": "",
+                    "days": 365,
+                    "expired_object_delete_marker": false
+                  }
+                ],
+                "id": "archive-old-data",
+                "noncurrent_version_expiration": [],
+                "noncurrent_version_transition": [],
+                "prefix": "",
+                "tags": {},
+                "transition": [
+                  {
+                    "date": "",
+                    "days": 90,
+                    "storage_class": "GLACIER_IR"
+                  }
+                ]
+              }
+            ],
+            "logging": [],
+            "object_lock_configuration": [],
+            "object_lock_enabled": false,
+            "policy": "",
+            "region": "ap-south-1",
+            "replication_configuration": [],
+            "request_payer": "BucketOwner",
+            "server_side_encryption_configuration": [
+              {
+                "rule": [
+                  {
+                    "apply_server_side_encryption_by_default": [
+                      {
+                        "kms_master_key_id": "",
+                        "sse_algorithm": "AES256"
+                      }
+                    ],
+                    "bucket_key_enabled": false
+                  }
+                ]
+              }
+            ],
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-data-lake",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-data-lake",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "timeouts": null,
+            "versioning": [
+              {
+                "enabled": true,
+                "mfa_delete": false
+              }
+            ],
+            "website": [],
+            "website_domain": null,
+            "website_endpoint": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjM2MDAwMDAwMDAwMDAsInJlYWQiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "module": "module.s3",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "glue_scripts",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "acceleration_status": "",
+            "acl": null,
+            "arn": "arn:aws:s3:::data-engineer-dev-glue-scripts",
+            "bucket": "data-engineer-dev-glue-scripts",
+            "bucket_domain_name": "data-engineer-dev-glue-scripts.s3.amazonaws.com",
+            "bucket_prefix": "",
+            "bucket_regional_domain_name": "data-engineer-dev-glue-scripts.s3.ap-south-1.amazonaws.com",
+            "cors_rule": [],
+            "force_destroy": false,
+            "grant": [
+              {
+                "id": "0ebe0385936f20c87931e5eccb31e71491dfbc87466fc46220820238687ceac4",
+                "permissions": [
+                  "FULL_CONTROL"
+                ],
+                "type": "CanonicalUser",
+                "uri": ""
+              }
+            ],
+            "hosted_zone_id": "Z11RGJOFQNVJUP",
+            "id": "data-engineer-dev-glue-scripts",
+            "lifecycle_rule": [],
+            "logging": [],
+            "object_lock_configuration": [],
+            "object_lock_enabled": false,
+            "policy": "",
+            "region": "ap-south-1",
+            "replication_configuration": [],
+            "request_payer": "BucketOwner",
+            "server_side_encryption_configuration": [
+              {
+                "rule": [
+                  {
+                    "apply_server_side_encryption_by_default": [
+                      {
+                        "kms_master_key_id": "",
+                        "sse_algorithm": "AES256"
+                      }
+                    ],
+                    "bucket_key_enabled": false
+                  }
+                ]
+              }
+            ],
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-glue-scripts",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-glue-scripts",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "timeouts": null,
+            "versioning": [
+              {
+                "enabled": false,
+                "mfa_delete": false
+              }
+            ],
+            "website": [],
+            "website_domain": null,
+            "website_endpoint": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjM2MDAwMDAwMDAwMDAsInJlYWQiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "module": "module.s3",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "logs",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "acceleration_status": "",
+            "acl": null,
+            "arn": "arn:aws:s3:::data-engineer-dev-logs",
+            "bucket": "data-engineer-dev-logs",
+            "bucket_domain_name": "data-engineer-dev-logs.s3.amazonaws.com",
+            "bucket_prefix": "",
+            "bucket_regional_domain_name": "data-engineer-dev-logs.s3.ap-south-1.amazonaws.com",
+            "cors_rule": [],
+            "force_destroy": false,
+            "grant": [
+              {
+                "id": "0ebe0385936f20c87931e5eccb31e71491dfbc87466fc46220820238687ceac4",
+                "permissions": [
+                  "FULL_CONTROL"
+                ],
+                "type": "CanonicalUser",
+                "uri": ""
+              }
+            ],
+            "hosted_zone_id": "Z11RGJOFQNVJUP",
+            "id": "data-engineer-dev-logs",
+            "lifecycle_rule": [],
+            "logging": [],
+            "object_lock_configuration": [],
+            "object_lock_enabled": false,
+            "policy": "",
+            "region": "ap-south-1",
+            "replication_configuration": [],
+            "request_payer": "BucketOwner",
+            "server_side_encryption_configuration": [
+              {
+                "rule": [
+                  {
+                    "apply_server_side_encryption_by_default": [
+                      {
+                        "kms_master_key_id": "",
+                        "sse_algorithm": "AES256"
+                      }
+                    ],
+                    "bucket_key_enabled": false
+                  }
+                ]
+              }
+            ],
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-logs",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-logs",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "timeouts": null,
+            "versioning": [
+              {
+                "enabled": false,
+                "mfa_delete": false
+              }
+            ],
+            "website": [],
+            "website_domain": null,
+            "website_endpoint": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjM2MDAwMDAwMDAwMDAsInJlYWQiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "module": "module.s3",
+      "mode": "managed",
+      "type": "aws_s3_bucket_lifecycle_configuration",
+      "name": "data_lake",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "bucket": "data-engineer-dev-data-lake",
+            "expected_bucket_owner": "",
+            "id": "data-engineer-dev-data-lake",
+            "rule": [
+              {
+                "abort_incomplete_multipart_upload": [],
+                "expiration": [
+                  {
+                    "date": null,
+                    "days": 365,
+                    "expired_object_delete_marker": false
+                  }
+                ],
+                "filter": [
+                  {
+                    "and": [],
+                    "object_size_greater_than": null,
+                    "object_size_less_than": null,
+                    "prefix": "",
+                    "tag": []
+                  }
+                ],
+                "id": "archive-old-data",
+                "noncurrent_version_expiration": [],
+                "noncurrent_version_transition": [],
+                "prefix": "",
+                "status": "Enabled",
+                "transition": [
+                  {
+                    "date": null,
+                    "days": 90,
+                    "storage_class": "GLACIER_IR"
+                  }
+                ]
+              }
+            ],
+            "timeouts": null,
+            "transition_default_minimum_object_size": "all_storage_classes_128K"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "dependencies": [
+            "module.s3.aws_s3_bucket.data_lake"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.s3",
+      "mode": "managed",
+      "type": "aws_s3_bucket_public_access_block",
+      "name": "data_lake",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "block_public_acls": true,
+            "block_public_policy": true,
+            "bucket": "data-engineer-dev-data-lake",
+            "id": "data-engineer-dev-data-lake",
+            "ignore_public_acls": true,
+            "restrict_public_buckets": true
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.s3.aws_s3_bucket.data_lake"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.s3",
+      "mode": "managed",
+      "type": "aws_s3_bucket_server_side_encryption_configuration",
+      "name": "data_lake",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "bucket": "data-engineer-dev-data-lake",
+            "expected_bucket_owner": "",
+            "id": "data-engineer-dev-data-lake",
+            "rule": [
+              {
+                "apply_server_side_encryption_by_default": [
+                  {
+                    "kms_master_key_id": "",
+                    "sse_algorithm": "AES256"
+                  }
+                ],
+                "bucket_key_enabled": false
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.s3.aws_s3_bucket.data_lake"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.s3",
+      "mode": "managed",
+      "type": "aws_s3_bucket_versioning",
+      "name": "data_lake",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "bucket": "data-engineer-dev-data-lake",
+            "expected_bucket_owner": "",
+            "id": "data-engineer-dev-data-lake",
+            "mfa": null,
+            "versioning_configuration": [
+              {
+                "mfa_delete": "",
+                "status": "Enabled"
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "module.s3.aws_s3_bucket.data_lake"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_eip",
+      "name": "nat",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "address": null,
+            "allocation_id": "eipalloc-09b0e854643b17f61",
+            "arn": "arn:aws:ec2:ap-south-1:661722818226:elastic-ip/eipalloc-09b0e854643b17f61",
+            "associate_with_private_ip": null,
+            "association_id": "eipassoc-031bffe9bc693021f",
+            "carrier_ip": "",
+            "customer_owned_ip": "",
+            "customer_owned_ipv4_pool": "",
+            "domain": "vpc",
+            "id": "eipalloc-09b0e854643b17f61",
+            "instance": "",
+            "ipam_pool_id": null,
+            "network_border_group": "ap-south-1",
+            "network_interface": "eni-059656a5bee27837f",
+            "private_dns": "ip-10-0-0-236.ap-south-1.compute.internal",
+            "private_ip": "10.0.0.236",
+            "ptr_record": "",
+            "public_dns": "ec2-13-205-73-106.ap-south-1.compute.amazonaws.com",
+            "public_ip": "13.205.73.106",
+            "public_ipv4_pool": "amazon",
+            "tags": {},
+            "tags_all": {},
+            "timeouts": null,
+            "vpc": true
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiZGVsZXRlIjoxODAwMDAwMDAwMDAsInJlYWQiOjkwMDAwMDAwMDAwMCwidXBkYXRlIjozMDAwMDAwMDAwMDB9fQ=="
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_internet_gateway",
+      "name": "igw",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-south-1:661722818226:internet-gateway/igw-0731ac809c94bec89",
+            "id": "igw-0731ac809c94bec89",
+            "owner_id": "661722818226",
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-igw",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-igw",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-05d2a0de93f8a67da"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "module.vpc.aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_nat_gateway",
+      "name": "nat",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "allocation_id": "eipalloc-09b0e854643b17f61",
+            "association_id": "eipassoc-031bffe9bc693021f",
+            "connectivity_type": "public",
+            "id": "nat-075925eaa8eb18e9f",
+            "network_interface_id": "eni-059656a5bee27837f",
+            "private_ip": "10.0.0.236",
+            "public_ip": "13.205.73.106",
+            "secondary_allocation_ids": [],
+            "secondary_private_ip_address_count": 0,
+            "secondary_private_ip_addresses": [],
+            "subnet_id": "subnet-0bc3f7febada26325",
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-nat",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-nat",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6MTgwMDAwMDAwMDAwMCwidXBkYXRlIjo2MDAwMDAwMDAwMDB9fQ==",
+          "dependencies": [
+            "data.aws_availability_zones.available",
+            "module.vpc.aws_eip.nat",
+            "module.vpc.aws_subnet.public",
+            "module.vpc.aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_route_table",
+      "name": "private",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-south-1:661722818226:route-table/rtb-06e3e72e79dd5d4e7",
+            "id": "rtb-06e3e72e79dd5d4e7",
+            "owner_id": "661722818226",
+            "propagating_vgws": [],
+            "route": [
+              {
+                "carrier_gateway_id": "",
+                "cidr_block": "0.0.0.0/0",
+                "core_network_arn": "",
+                "destination_prefix_list_id": "",
+                "egress_only_gateway_id": "",
+                "gateway_id": "",
+                "ipv6_cidr_block": "",
+                "local_gateway_id": "",
+                "nat_gateway_id": "nat-075925eaa8eb18e9f",
+                "network_interface_id": "",
+                "transit_gateway_id": "",
+                "vpc_endpoint_id": "",
+                "vpc_peering_connection_id": ""
+              }
+            ],
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-private-rt",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-private-rt",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-05d2a0de93f8a67da"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjEyMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "data.aws_availability_zones.available",
+            "module.vpc.aws_eip.nat",
+            "module.vpc.aws_nat_gateway.nat",
+            "module.vpc.aws_subnet.public",
+            "module.vpc.aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_route_table",
+      "name": "public",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-south-1:661722818226:route-table/rtb-0b141d844df35563e",
+            "id": "rtb-0b141d844df35563e",
+            "owner_id": "661722818226",
+            "propagating_vgws": [],
+            "route": [
+              {
+                "carrier_gateway_id": "",
+                "cidr_block": "0.0.0.0/0",
+                "core_network_arn": "",
+                "destination_prefix_list_id": "",
+                "egress_only_gateway_id": "",
+                "gateway_id": "igw-0731ac809c94bec89",
+                "ipv6_cidr_block": "",
+                "local_gateway_id": "",
+                "nat_gateway_id": "",
+                "network_interface_id": "",
+                "transit_gateway_id": "",
+                "vpc_endpoint_id": "",
+                "vpc_peering_connection_id": ""
+              }
+            ],
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-public-rt",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-public-rt",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-05d2a0de93f8a67da"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjEyMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "module.vpc.aws_internet_gateway.igw",
+            "module.vpc.aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_route_table_association",
+      "name": "private",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "gateway_id": "",
+            "id": "rtbassoc-040eed966787966ab",
+            "route_table_id": "rtb-06e3e72e79dd5d4e7",
+            "subnet_id": "subnet-09a5d378305bfa6ce",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjEyMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "data.aws_availability_zones.available",
+            "module.vpc.aws_eip.nat",
+            "module.vpc.aws_nat_gateway.nat",
+            "module.vpc.aws_route_table.private",
+            "module.vpc.aws_subnet.private",
+            "module.vpc.aws_subnet.public",
+            "module.vpc.aws_vpc.main"
+          ]
+        },
+        {
+          "index_key": 1,
+          "schema_version": 0,
+          "attributes": {
+            "gateway_id": "",
+            "id": "rtbassoc-088cbf529e1de3543",
+            "route_table_id": "rtb-06e3e72e79dd5d4e7",
+            "subnet_id": "subnet-03cbb6437bb6f0c49",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjEyMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "data.aws_availability_zones.available",
+            "module.vpc.aws_eip.nat",
+            "module.vpc.aws_nat_gateway.nat",
+            "module.vpc.aws_route_table.private",
+            "module.vpc.aws_subnet.private",
+            "module.vpc.aws_subnet.public",
+            "module.vpc.aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_route_table_association",
+      "name": "public",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 0,
+          "attributes": {
+            "gateway_id": "",
+            "id": "rtbassoc-0e6489a539cc2eb58",
+            "route_table_id": "rtb-0b141d844df35563e",
+            "subnet_id": "subnet-0bc3f7febada26325",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjEyMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "data.aws_availability_zones.available",
+            "module.vpc.aws_internet_gateway.igw",
+            "module.vpc.aws_route_table.public",
+            "module.vpc.aws_subnet.public",
+            "module.vpc.aws_vpc.main"
+          ]
+        },
+        {
+          "index_key": 1,
+          "schema_version": 0,
+          "attributes": {
+            "gateway_id": "",
+            "id": "rtbassoc-0cb6458a9acafb4cf",
+            "route_table_id": "rtb-0b141d844df35563e",
+            "subnet_id": "subnet-0018157be9e6eba4a",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjEyMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "data.aws_availability_zones.available",
+            "module.vpc.aws_internet_gateway.igw",
+            "module.vpc.aws_route_table.public",
+            "module.vpc.aws_subnet.public",
+            "module.vpc.aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "default",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-south-1:661722818226:security-group/sg-0ffda797d2d1ecba3",
+            "description": "Default security group",
+            "egress": [
+              {
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "description": "",
+                "from_port": 0,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "-1",
+                "security_groups": [],
+                "self": false,
+                "to_port": 0
+              }
+            ],
+            "id": "sg-0ffda797d2d1ecba3",
+            "ingress": [
+              {
+                "cidr_blocks": [],
+                "description": "",
+                "from_port": 0,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "-1",
+                "security_groups": [],
+                "self": true,
+                "to_port": 0
+              }
+            ],
+            "name": "data-engineer-dev-default-sg",
+            "name_prefix": "",
+            "owner_id": "661722818226",
+            "revoke_rules_on_delete": false,
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-default-sg",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-default-sg",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-05d2a0de93f8a67da"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6OTAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIxIn0=",
+          "dependencies": [
+            "module.vpc.aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "ecs",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-south-1:661722818226:security-group/sg-0cf6968234af58831",
+            "description": "Security group for ECS tasks",
+            "egress": [
+              {
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "description": "",
+                "from_port": 0,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "-1",
+                "security_groups": [],
+                "self": false,
+                "to_port": 0
+              }
+            ],
+            "id": "sg-0cf6968234af58831",
+            "ingress": [
+              {
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "description": "",
+                "from_port": 8083,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "tcp",
+                "security_groups": [],
+                "self": false,
+                "to_port": 8083
+              },
+              {
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "description": "",
+                "from_port": 80,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "tcp",
+                "security_groups": [],
+                "self": false,
+                "to_port": 80
+              }
+            ],
+            "name": "data-engineer-dev-ecs-sg",
+            "name_prefix": "",
+            "owner_id": "661722818226",
+            "revoke_rules_on_delete": false,
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-ecs-sg",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-ecs-sg",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-05d2a0de93f8a67da"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6OTAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIxIn0=",
+          "dependencies": [
+            "module.vpc.aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "glue",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-south-1:661722818226:security-group/sg-0beacdffb66c2d26a",
+            "description": "Security group for Glue jobs",
+            "egress": [
+              {
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "description": "",
+                "from_port": 0,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "-1",
+                "security_groups": [],
+                "self": false,
+                "to_port": 0
+              }
+            ],
+            "id": "sg-0beacdffb66c2d26a",
+            "ingress": [
+              {
+                "cidr_blocks": [
+                  "10.0.0.0/16"
+                ],
+                "description": "",
+                "from_port": 0,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "-1",
+                "security_groups": [],
+                "self": false,
+                "to_port": 0
+              }
+            ],
+            "name": "data-engineer-dev-glue-sg",
+            "name_prefix": "",
+            "owner_id": "661722818226",
+            "revoke_rules_on_delete": false,
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-glue-sg",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-glue-sg",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-05d2a0de93f8a67da"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6OTAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIxIn0=",
+          "dependencies": [
+            "module.vpc.aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "kafka",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-south-1:661722818226:security-group/sg-0192aad13ab505e48",
+            "description": "Security group for Kafka/MSK",
+            "egress": [],
+            "id": "sg-0192aad13ab505e48",
+            "ingress": [
+              {
+                "cidr_blocks": [
+                  "10.0.0.0/16"
+                ],
+                "description": "",
+                "from_port": 9092,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "tcp",
+                "security_groups": [],
+                "self": false,
+                "to_port": 9092
+              },
+              {
+                "cidr_blocks": [],
+                "description": "",
+                "from_port": 9092,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "tcp",
+                "security_groups": [
+                  "sg-0cf6968234af58831"
+                ],
+                "self": false,
+                "to_port": 9092
+              }
+            ],
+            "name": "data-engineer-dev-kafka-sg",
+            "name_prefix": "",
+            "owner_id": "661722818226",
+            "revoke_rules_on_delete": false,
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-kafka-sg",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-kafka-sg",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-05d2a0de93f8a67da"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6OTAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIxIn0=",
+          "dependencies": [
+            "module.vpc.aws_security_group.ecs",
+            "module.vpc.aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "postgres",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-south-1:661722818226:security-group/sg-097f72f02e16b77c2",
+            "description": "Security group for PostgreSQL",
+            "egress": [],
+            "id": "sg-097f72f02e16b77c2",
+            "ingress": [
+              {
+                "cidr_blocks": [
+                  "10.0.0.0/16"
+                ],
+                "description": "",
+                "from_port": 5432,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "tcp",
+                "security_groups": [],
+                "self": false,
+                "to_port": 5432
+              }
+            ],
+            "name": "data-engineer-dev-postgres-sg",
+            "name_prefix": "",
+            "owner_id": "661722818226",
+            "revoke_rules_on_delete": false,
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-postgres-sg",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-postgres-sg",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-05d2a0de93f8a67da"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6OTAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIxIn0=",
+          "dependencies": [
+            "module.vpc.aws_vpc.main"
+          ],
+          "create_before_destroy": true
+        },
+        {
+          "deposed": "d6412038",
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-south-1:661722818226:security-group/sg-07bf85d1f1a947c92",
+            "description": "Security group for PostgreSQL",
+            "egress": [],
+            "id": "sg-07bf85d1f1a947c92",
+            "ingress": [
+              {
+                "cidr_blocks": [
+                  "10.0.0.0/16"
+                ],
+                "description": "",
+                "from_port": 5432,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "tcp",
+                "security_groups": [],
+                "self": false,
+                "to_port": 5432
+              }
+            ],
+            "name": "cdc-pipeline-dev-postgres-sg",
+            "name_prefix": "",
+            "owner_id": "661722818226",
+            "revoke_rules_on_delete": false,
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "cdc-pipeline-dev-postgres-sg",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "cdc-pipeline-dev-postgres-sg",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-05d2a0de93f8a67da"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6OTAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIxIn0=",
+          "dependencies": [
+            "module.vpc.aws_vpc.main"
+          ],
+          "create_before_destroy": true
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_subnet",
+      "name": "private",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-south-1:661722818226:subnet/subnet-09a5d378305bfa6ce",
+            "assign_ipv6_address_on_creation": false,
+            "availability_zone": "ap-south-1a",
+            "availability_zone_id": "aps1-az1",
+            "cidr_block": "10.0.2.0/24",
+            "customer_owned_ipv4_pool": "",
+            "enable_dns64": false,
+            "enable_lni_at_device_index": 0,
+            "enable_resource_name_dns_a_record_on_launch": false,
+            "enable_resource_name_dns_aaaa_record_on_launch": false,
+            "id": "subnet-09a5d378305bfa6ce",
+            "ipv6_cidr_block": "",
+            "ipv6_cidr_block_association_id": "",
+            "ipv6_native": false,
+            "map_customer_owned_ip_on_launch": false,
+            "map_public_ip_on_launch": false,
+            "outpost_arn": "",
+            "owner_id": "661722818226",
+            "private_dns_hostname_type_on_launch": "ip-name",
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-private-1",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline",
+              "SubnetType": "private"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-private-1",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline",
+              "SubnetType": "private"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-05d2a0de93f8a67da"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6MTIwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "data.aws_availability_zones.available",
+            "module.vpc.aws_vpc.main"
+          ],
+          "create_before_destroy": true
+        },
+        {
+          "index_key": 1,
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-south-1:661722818226:subnet/subnet-03cbb6437bb6f0c49",
+            "assign_ipv6_address_on_creation": false,
+            "availability_zone": "ap-south-1b",
+            "availability_zone_id": "aps1-az3",
+            "cidr_block": "10.0.3.0/24",
+            "customer_owned_ipv4_pool": "",
+            "enable_dns64": false,
+            "enable_lni_at_device_index": 0,
+            "enable_resource_name_dns_a_record_on_launch": false,
+            "enable_resource_name_dns_aaaa_record_on_launch": false,
+            "id": "subnet-03cbb6437bb6f0c49",
+            "ipv6_cidr_block": "",
+            "ipv6_cidr_block_association_id": "",
+            "ipv6_native": false,
+            "map_customer_owned_ip_on_launch": false,
+            "map_public_ip_on_launch": false,
+            "outpost_arn": "",
+            "owner_id": "661722818226",
+            "private_dns_hostname_type_on_launch": "ip-name",
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-private-2",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline",
+              "SubnetType": "private"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-private-2",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline",
+              "SubnetType": "private"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-05d2a0de93f8a67da"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6MTIwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "data.aws_availability_zones.available",
+            "module.vpc.aws_vpc.main"
+          ],
+          "create_before_destroy": true
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_subnet",
+      "name": "public",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "index_key": 0,
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-south-1:661722818226:subnet/subnet-0bc3f7febada26325",
+            "assign_ipv6_address_on_creation": false,
+            "availability_zone": "ap-south-1a",
+            "availability_zone_id": "aps1-az1",
+            "cidr_block": "10.0.0.0/24",
+            "customer_owned_ipv4_pool": "",
+            "enable_dns64": false,
+            "enable_lni_at_device_index": 0,
+            "enable_resource_name_dns_a_record_on_launch": false,
+            "enable_resource_name_dns_aaaa_record_on_launch": false,
+            "id": "subnet-0bc3f7febada26325",
+            "ipv6_cidr_block": "",
+            "ipv6_cidr_block_association_id": "",
+            "ipv6_native": false,
+            "map_customer_owned_ip_on_launch": false,
+            "map_public_ip_on_launch": true,
+            "outpost_arn": "",
+            "owner_id": "661722818226",
+            "private_dns_hostname_type_on_launch": "ip-name",
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-public-1",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline",
+              "SubnetType": "public"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-public-1",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline",
+              "SubnetType": "public"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-05d2a0de93f8a67da"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6MTIwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "data.aws_availability_zones.available",
+            "module.vpc.aws_vpc.main"
+          ]
+        },
+        {
+          "index_key": 1,
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-south-1:661722818226:subnet/subnet-0018157be9e6eba4a",
+            "assign_ipv6_address_on_creation": false,
+            "availability_zone": "ap-south-1b",
+            "availability_zone_id": "aps1-az3",
+            "cidr_block": "10.0.1.0/24",
+            "customer_owned_ipv4_pool": "",
+            "enable_dns64": false,
+            "enable_lni_at_device_index": 0,
+            "enable_resource_name_dns_a_record_on_launch": false,
+            "enable_resource_name_dns_aaaa_record_on_launch": false,
+            "id": "subnet-0018157be9e6eba4a",
+            "ipv6_cidr_block": "",
+            "ipv6_cidr_block_association_id": "",
+            "ipv6_native": false,
+            "map_customer_owned_ip_on_launch": false,
+            "map_public_ip_on_launch": true,
+            "outpost_arn": "",
+            "owner_id": "661722818226",
+            "private_dns_hostname_type_on_launch": "ip-name",
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-public-2",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline",
+              "SubnetType": "public"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-public-2",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline",
+              "SubnetType": "public"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-05d2a0de93f8a67da"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6MTIwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "data.aws_availability_zones.available",
+            "module.vpc.aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "module": "module.vpc",
+      "mode": "managed",
+      "type": "aws_vpc",
+      "name": "main",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-south-1:661722818226:vpc/vpc-05d2a0de93f8a67da",
+            "assign_generated_ipv6_cidr_block": false,
+            "cidr_block": "10.0.0.0/16",
+            "default_network_acl_id": "acl-0fb326f69f3cc596b",
+            "default_route_table_id": "rtb-086be084d70bff939",
+            "default_security_group_id": "sg-028c852c30b303ce9",
+            "dhcp_options_id": "dopt-0b30e9a41a0f26aef",
+            "enable_dns_hostnames": true,
+            "enable_dns_support": true,
+            "enable_network_address_usage_metrics": false,
+            "id": "vpc-05d2a0de93f8a67da",
+            "instance_tenancy": "default",
+            "ipv4_ipam_pool_id": null,
+            "ipv4_netmask_length": null,
+            "ipv6_association_id": "",
+            "ipv6_cidr_block": "",
+            "ipv6_cidr_block_network_border_group": "",
+            "ipv6_ipam_pool_id": "",
+            "ipv6_netmask_length": 0,
+            "main_route_table_id": "rtb-086be084d70bff939",
+            "owner_id": "661722818226",
+            "tags": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-vpc",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            },
+            "tags_all": {
+              "Environment": "dev",
+              "ManagedBy": "terraform",
+              "Name": "data-engineer-dev-vpc",
+              "Owner": "data-engineering-team",
+              "Project": "cdc-pipeline"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ==",
+          "create_before_destroy": true
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

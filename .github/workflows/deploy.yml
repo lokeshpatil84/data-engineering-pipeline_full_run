@@ -1,0 +1,260 @@
+# GitHub Actions CI/CD for AWS Deployment
+# Automated deployment pipeline for CDC Data Pipeline
+
+name: CDC Pipeline Deployment
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+      action:
+        description: 'Deployment action'
+        required: true
+        default: 'apply'
+        type: choice
+        options:
+          - apply
+          - destroy
+
+env:
+  AWS_REGION: ap-south-1
+  TERRAFORM_VERSION: 1.5.0
+
+jobs:
+  # Validate and Plan
+  plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    outputs:
+      tfplan: ${{ steps.plan.outputs.tfplan }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Init
+        id: init
+        working-directory: ./terraform
+        run: terraform init
+
+      - name: Terraform Plan
+        id: plan
+        working-directory: ./terraform
+        run: |
+          terraform plan \
+            -var="project_name=${{ github.event.inputs.project_name || 'cdc-pipeline' }}" \
+            -var="environment=${{ github.event.inputs.environment || 'dev' }}" \
+            -out=tfplan
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  # Deploy Infrastructure
+  deploy:
+    name: Deploy Infrastructure
+    needs: plan
+    if: github.event_name == 'push' || github.event.inputs.action == 'apply'
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.environment || 'dev' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Init
+        working-directory: ./terraform
+        run: terraform init
+
+      - name: Terraform Apply
+        working-directory: ./terraform
+        run: |
+          terraform apply tfplan
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Upload Glue Scripts
+        run: |
+          PROJECT_NAME="${{ github.event.inputs.project_name || 'cdc-pipeline' }}"
+          ENV="${{ github.event.inputs.environment || 'dev' }}"
+          BUCKET="${PROJECT_NAME}-${ENV}-data-lake"
+          
+          aws s3 cp glue/cdc_processor.py s3://${BUCKET}/scripts/
+          aws s3 cp glue/gold_processor.py s3://${BUCKET}/scripts/
+
+      - name: Upload Airflow DAGs
+        run: |
+          PROJECT_NAME="${{ github.event.inputs.project_name || 'cdc-pipeline' }}"
+          ENV="${{ github.event.inputs.environment || 'dev' }}"
+          BUCKET="${PROJECT_NAME}-${ENV}-data-lake"
+          
+          aws s3 cp airflow/dags/cdc_pipeline_dag.py s3://${BUCKET}/dags/
+
+      - name: Get Outputs
+        working-directory: ./terraform
+        run: terraform output
+
+  # Destroy Infrastructure
+  destroy:
+    name: Destroy Infrastructure
+    if: github.event.inputs.action == 'destroy'
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.environment || 'dev' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Init
+        working-directory: ./terraform
+        run: terraform init
+
+      - name: Terraform Destroy
+        working-directory: ./terraform
+        run: |
+          terraform destroy \
+            -var="project_name=${{ github.event.inputs.project_name || 'cdc-pipeline' }}" \
+            -var="environment=${{ github.event.inputs.environment || 'dev' }}" \
+            -auto-approve
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  # Glue Job Management
+  glue-jobs:
+    name: Manage Glue Jobs
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Start CDC Processor Job
+        run: |
+          PROJECT_NAME="${{ github.event.inputs.project_name || 'cdc-pipeline' }}"
+          ENV="${{ github.event.inputs.environment || 'dev' }}"
+          
+          aws glue start-job-run \
+            --job-name ${PROJECT_NAME}-${ENV}-cdc-processor
+
+      - name: Start Gold Processor Job
+        run: |
+          PROJECT_NAME="${{ github.event.inputs.project_name || 'cdc-pipeline' }}"
+          ENV="${{ github.event.inputs.environment || 'dev' }}"
+          
+          aws glue start-job-run \
+            --job-name ${PROJECT_NAME}-${ENV}-gold-processor
+
+  # Cost Check
+  cost-check:
+    name: Cost Optimization Check
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Check Resource Costs
+        run: |
+          PROJECT_NAME="${{ github.event.inputs.project_name || 'cdc-pipeline' }}"
+          ENV="${{ github.event.inputs.environment || 'dev' }}"
+          
+          echo "=== AWS Cost Explorer ==="
+          aws ce get-cost-and-usage \
+            --time-period Start=$(date -d "1 day ago" +%Y-%m-%d),End=$(date +%Y-%m-%d) \
+            --granularity DAILY \
+            --metrics "UnblendedCost" \
+            --group-by Type=DIMENSION,Key=SERVICE
+
+      - name: Check Running Resources
+        run: |
+          PROJECT_NAME="${{ github.event.inputs.project_name || 'cdc-pipeline' }}"
+          ENV="${{ github.event.inputs.environment || 'dev' }}"
+          
+          echo "=== Running ECS Services ==="
+          aws ecs list-services \
+            --cluster ${PROJECT_NAME}-${ENV}-ecs \
+            --query 'serviceArns' \
+            --output text
+
+          echo "=== Running Glue Jobs ==="
+          aws glue get-job-runs \
+            --job-name ${PROJECT_NAME}-${ENV}-cdc-processor \
+            --max-results 5 \
+            --query 'JobRuns[].[JobName,JobRunState,ExecutionTime]' \
+            --output table
+
+  # Notification
+  notify:
+    name: Send Notification
+    runs-on: ubuntu-latest
+    needs: [deploy, glue-jobs, cost-check]
+    if: always()
+    steps:
+      - name: Send SNS Notification
+        if: needs.deploy.result == 'success'
+        run: |
+          aws sns publish \
+            --topic-arn arn:aws:sns:${{ env.AWS_REGION }}:${{ secrets.AWS_ACCOUNT_ID }}:cdc-pipeline-${{ github.event.inputs.environment || 'dev' }}-alerts \
+            --message "CDC Pipeline deployed successfully to ${{ github.event.inputs.environment || 'dev' }} environment" \
+            --subject "CDC Pipeline Deployment Success"
+
