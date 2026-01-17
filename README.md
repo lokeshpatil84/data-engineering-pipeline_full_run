@@ -284,7 +284,4 @@ docker-compose down -v
 cd terraform && terraform destroy -auto-approve
 ```
 
-## 📄 License
-
-MIT License - Built with ❤️ for the data engineering community
 
